@@ -12,16 +12,16 @@ const Shop = () => {
       .then((data) => setProducts(data));
   }, []);
 
-  useEffect(()=> {
+  useEffect(() => {
     // console.log(products);
-    const storedCard = getShoppingCart()
+    const storedCard = getShoppingCart();
     const addedProduct = [];
     // console.log(storedCard);
-    for(const id in storedCard){
+    for (const id in storedCard) {
       // console.log(id);
-      const saveCart = products.find(data=> data.id === id)
-      console.log(saveCart);
-      if(saveCart){
+      const saveCart = products.find((data) => data.id === id);
+      // console.log(saveCart);
+      if (saveCart) {
         const quantity = storedCard[id];
         saveCart.quantity = quantity;
         addedProduct.push(saveCart);
@@ -29,32 +29,41 @@ const Shop = () => {
     }
     // console.log(addedProduct);
     setCart(addedProduct);
-  },[products])
-//   console.log(products);
+  }, [products]);
+  // console.log(cart);
 
   const handlers = (product) => {
-    const newCart = [...cart, product];
+    // const newCart = [...cart, product];
+    let newCart = [];
+    const exist = cart.find((pd) => pd.id === product.id);
+    if (!exist) {
+      product.quantity = 1;
+      newCart = [...cart, product];
+    } else {
+      exist.quantity = exist.quantity + 1;
+      const reaming = cart.filter((pd) => pd.id !== product.id);
+      newCart = [...reaming, exist];
+    }
+
     setCart(newCart);
     // console.log(product.id);
-    addToDb(product.id)
-  }
-//   console.log(cart.length);
+    addToDb(product.id);
+  };
+  //   console.log(cart.length);
   return (
     <div className="grid grid-cols-6">
       <div className="col-span-5 grid grid-cols-2 md:grid-cols-3 gap-3">
-            {
-                products.map((product) => <Product
-                product={product}
-                key={product.id}
-                handlers={handlers}
-                ></Product>)
-            }
-        </div>
+        {products.map((product) => (
+          <Product
+            product={product}
+            key={product.id}
+            handlers={handlers}
+          ></Product>
+        ))}
+      </div>
       <div className="col-span-1 flex justify-center mt-12">
-        
         <Cart cart={cart}></Cart>
-
-        </div>
+      </div>
     </div>
   );
 };
